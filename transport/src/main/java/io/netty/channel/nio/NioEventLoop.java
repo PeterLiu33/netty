@@ -49,6 +49,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * 这个和EventExecutorGroup不一样，多了一个next，且因为继承了，SingleThreadEventLoop，因此多了个task队列，单线程
+ *
  * {@link SingleThreadEventLoop} implementation which register the {@link Channel}'s to a
  * {@link Selector} and so does the multi-plexing of these in the event loop.
  *
