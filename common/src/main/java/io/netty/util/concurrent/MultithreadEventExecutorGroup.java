@@ -32,8 +32,11 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
 
     private final EventExecutor[] children;
     private final Set<EventExecutor> readonlyChildren;
+    // 关闭NioEventLoop的个数
     private final AtomicInteger terminatedChildren = new AtomicInteger();
+    // 中断结果
     private final Promise<?> terminationFuture = new DefaultPromise(GlobalEventExecutor.INSTANCE);
+    // NioEventLoop执行器列表的选择器，其中默认是按顺序轮询
     private final EventExecutorChooserFactory.EventExecutorChooser chooser;
 
     /**
@@ -107,9 +110,9 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                 }
             }
         }
-
+        // 获取选择器
         chooser = chooserFactory.newChooser(children);
-
+        // 中断监听器
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
             @Override
             public void operationComplete(Future<Object> future) throws Exception {
