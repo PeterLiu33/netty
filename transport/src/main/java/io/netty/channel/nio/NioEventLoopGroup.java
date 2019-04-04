@@ -32,6 +32,8 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  *
+ * NioEventLoop组，内含EventExecutor[] children（在MultithreadEventExecutorGroup父类中），而NioEventLoop是一个单线程的
+ * NioEventLoopGroup默认的children大小为1，使用newChild()进行初始化，并且直接open了selector
  * <p>
  * {@link MultithreadEventLoopGroup} implementations which is used for NIO {@link Selector} based {@link Channel}s.
  */

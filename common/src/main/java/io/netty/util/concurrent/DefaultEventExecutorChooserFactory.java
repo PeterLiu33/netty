@@ -20,6 +20,8 @@ import io.netty.util.internal.UnstableApi;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 执行器的选择器
+ *
  * Default implementation which uses simple round-robin to choose next {@link EventExecutor}.
  */
 @UnstableApi
@@ -40,9 +42,13 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
     }
 
     private static boolean isPowerOfTwo(int val) {
+        // 是否是2的倍数
         return (val & -val) == val;
     }
 
+    /**
+     * 如果是2的倍数，则用按位与的方式进行循环next
+     */
     private static final class PowerOfTwoEventExecutorChooser implements EventExecutorChooser {
         private final AtomicInteger idx = new AtomicInteger();
         private final EventExecutor[] executors;
@@ -57,6 +63,9 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
         }
     }
 
+    /**
+     * 如果不是2的倍数，则用传统的求余方式进行求解
+     */
     private static final class GenericEventExecutorChooser implements EventExecutorChooser {
         private final AtomicInteger idx = new AtomicInteger();
         private final EventExecutor[] executors;

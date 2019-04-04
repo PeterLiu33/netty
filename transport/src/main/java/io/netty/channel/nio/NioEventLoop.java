@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 这个和EventExecutorGroup不一样，多了一个next，且因为继承了，SingleThreadEventLoop，因此多了个task队列，单线程
- *
+ * 该类被NioEventLoopGroup引用，作为children数组的内容
  * {@link SingleThreadEventLoop} implementation which register the {@link Channel}'s to a
  * {@link Selector} and so does the multi-plexing of these in the event loop.
  *
@@ -118,10 +118,11 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     /**
      * The NIO {@link Selector}.
      */
-    private Selector selector;
-    private Selector unwrappedSelector;
+    private Selector selector; // SelectedSelectionKeySetSelector，里面包含有selectedKeySet
+    private Selector unwrappedSelector; // 包装选择器
     private SelectedSelectionKeySet selectedKeys;
 
+    // NIO选择器
     private final SelectorProvider provider;
 
     /**
@@ -132,14 +133,25 @@ public final class NioEventLoop extends SingleThreadEventLoop {
      */
     private final AtomicBoolean wakenUp = new AtomicBoolean();
 
+    // 选择策略
     private final SelectStrategy selectStrategy;
 
     private volatile int ioRatio = 50;
     private int cancelledKeys;
     private boolean needsToSelectAgain;
 
+    /**
+     * 重要的初始化构造器
+     *
+     * @param parent
+     * @param executor
+     * @param selectorProvider NIO选择器
+     * @param strategy 选择策略
+     * @param rejectedExecutionHandler 拒绝策略
+     */
     NioEventLoop(NioEventLoopGroup parent, Executor executor, SelectorProvider selectorProvider,
                  SelectStrategy strategy, RejectedExecutionHandler rejectedExecutionHandler) {
+        // 使用了LinkBlockingQueue，默认的阻塞队列长度为16
         super(parent, executor, false, DEFAULT_MAX_PENDING_TASKS, rejectedExecutionHandler);
         if (selectorProvider == null) {
             throw new NullPointerException("selectorProvider");
@@ -148,6 +160,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             throw new NullPointerException("selectStrategy");
         }
         provider = selectorProvider;
+        // 启动选择器
         final SelectorTuple selectorTuple = openSelector();
         selector = selectorTuple.selector;
         unwrappedSelector = selectorTuple.unwrappedSelector;
@@ -169,6 +182,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    // 启动选择器
     private SelectorTuple openSelector() {
         final Selector unwrappedSelector;
         try {
@@ -178,6 +192,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
 
         if (DISABLE_KEYSET_OPTIMIZATION) {
+            // 默认为false关闭
             return new SelectorTuple(unwrappedSelector);
         }
 
