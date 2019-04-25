@@ -18,6 +18,8 @@ package io.netty.channel;
 import io.netty.util.IntSupplier;
 
 /**
+ * 用于标识NioEventLoopGroup的执行职责，用于确定在Reactor线程模型中的职责
+ *
  * Select strategy interface.
  *
  * Provides the ability to control the behavior of the select loop. For example a blocking select
@@ -26,10 +28,12 @@ import io.netty.util.IntSupplier;
 public interface SelectStrategy {
 
     /**
+     * 标识为accept pool
      * Indicates a blocking select should follow.
      */
     int SELECT = -1;
     /**
+     * 标识为io pool
      * Indicates the IO loop should be retried, no blocking select to follow directly.
      */
     int CONTINUE = -2;

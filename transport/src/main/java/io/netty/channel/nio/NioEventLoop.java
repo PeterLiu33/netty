@@ -741,15 +741,26 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /**
+     * 解决了JDK epoll bug造成CPU 100%的问题
+     *
+     * @param oldWakenUp
+     * @throws IOException
+     */
     private void select(boolean oldWakenUp) throws IOException {
         Selector selector = this.selector;
         try {
+            // 空轮询计数
             int selectCnt = 0;
+            // 当前时间
             long currentTimeNanos = System.nanoTime();
+            // 超时时间点
             long selectDeadLineNanos = currentTimeNanos + delayNanos(currentTimeNanos);
             for (;;) {
+                // 判断是否超时的持续时间
                 long timeoutMillis = (selectDeadLineNanos - currentTimeNanos + 500000L) / 1000000L;
                 if (timeoutMillis <= 0) {
+                    // 过期
                     if (selectCnt == 0) {
                         selector.selectNow();
                         selectCnt = 1;
@@ -766,7 +777,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     selectCnt = 1;
                     break;
                 }
-
+                // 在指定时间内获取
                 int selectedKeys = selector.select(timeoutMillis);
                 selectCnt ++;
 
@@ -795,15 +806,17 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 long time = System.nanoTime();
                 if (time - TimeUnit.MILLISECONDS.toNanos(timeoutMillis) >= currentTimeNanos) {
                     // timeoutMillis elapsed without anything selected.
+                    // 超时，说明不是空轮询，重置轮询次数
                     selectCnt = 1;
                 } else if (SELECTOR_AUTO_REBUILD_THRESHOLD > 0 &&
                         selectCnt >= SELECTOR_AUTO_REBUILD_THRESHOLD) {
+                    // 时间太快了，低于间隔时间要求，判断可能发生了epoll空轮询问题
                     // The selector returned prematurely many times in a row.
                     // Rebuild the selector to work around the problem.
                     logger.warn(
                             "Selector.select() returned prematurely {} times in a row; rebuilding Selector {}.",
                             selectCnt, selector);
-
+                    // 重建selector
                     rebuildSelector();
                     selector = this.selector;
 

@@ -73,6 +73,8 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     }
 
     /**
+     * 绑定Reactor线程池，实现主从Reactor线程模型，当日也可以是其他三种。
+     * parentGroup是accept pool， childGroup是io pool，前者处理网络连接、鉴权和安全等，后者是负责网络数据IO的线程池
      * Set the {@link EventLoopGroup} for the parent (acceptor) and the child (client). These
      * {@link EventLoopGroup}'s are used to handle all the events and IO for {@link ServerChannel} and
      * {@link Channel}'s.
