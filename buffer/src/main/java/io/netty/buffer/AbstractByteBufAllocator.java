@@ -238,6 +238,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
     protected abstract ByteBuf newHeapBuffer(int initialCapacity, int maxCapacity);
 
     /**
+     * 分配内存的抽象方法
      * Create a direct {@link ByteBuf} with the given initialCapacity and maxCapacity.
      */
     protected abstract ByteBuf newDirectBuffer(int initialCapacity, int maxCapacity);

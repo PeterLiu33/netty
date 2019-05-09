@@ -29,6 +29,9 @@ import java.util.NoSuchElementException;
 
 
 /**
+ * ChannelPipeline 提供了 ChannelHandler 链的容器，并定义了用于在该链上传播入站和出站事件流的 API。
+ * 当 Channel 被创建时，它会被自动地分配到它专属的 ChannelPipeline。
+ *
  * A list of {@link ChannelHandler}s which handles or intercepts inbound events and outbound operations of a
  * {@link Channel}.  {@link ChannelPipeline} implements an advanced form of the
  * <a href="http://www.oracle.com/technetwork/java/interceptingfilter-142169.html">Intercepting Filter</a> pattern

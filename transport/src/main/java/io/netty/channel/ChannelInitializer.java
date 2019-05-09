@@ -25,6 +25,9 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * 通常一个连接channel建立，IO操作包括编解码，粘包/拆包，业务处理，发送数据，
+ * 这些操作对应一个handler，ChannelInitializer便是用来配置这些Handler，会提供一个ChannelPipeline，并把Handler加入到ChannelPipeline。
+ *
  * A special {@link ChannelInboundHandler} which offers an easy way to initialize a {@link Channel} once it was
  * registered to its {@link EventLoop}.
  *

@@ -75,6 +75,17 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     /**
      * 绑定Reactor线程池，实现主从Reactor线程模型，当日也可以是其他三种。
      * parentGroup是accept pool， childGroup是io pool，前者处理网络连接、鉴权和安全等，后者是负责网络数据IO的线程池
+     *
+     * 随机选取一个NioEventLoop线程接收客户端的连接，一般服务端监听一个端口只需一个NioEventLoop线程，
+     * 多个服务端端口，Boss线程池分配多个NioEventLoop负责监听
+     *
+     * 在监听一个服务端端口的情况下，Boss线程池（EventLoopGroup）分配一个NioEventLoop通过NioServerSocketChannel监听端口，
+     * 建立客户端TCP连接。客户端连接建立之后，worker线程组（EventLoopGroup）分配一个NioEventLoop线程，
+     * 连接创建的socketChannel绑定到EventLoop线程（对应一个selector），然后监听IO事件。
+     * 一个NioEventLoop线程可以绑定多个channel，同一个channel只能绑定到一个NioEventLoop线程，
+     * 防止并发操作带来的线程切换。NioEventLoop是单线程执行，保证Channel的pipline在单线程中执行，
+     * 同时保证了ChannelHandler的执行顺序。
+     *
      * Set the {@link EventLoopGroup} for the parent (acceptor) and the child (client). These
      * {@link EventLoopGroup}'s are used to handle all the events and IO for {@link ServerChannel} and
      * {@link Channel}'s.

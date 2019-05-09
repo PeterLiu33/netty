@@ -37,6 +37,8 @@ import java.util.NoSuchElementException;
 import static io.netty.util.internal.ObjectUtil.checkNotNull;
 
 /**
+ * 组合ByteBuf，防止对多个ByteBuf进行合并的内存拷贝开销，零拷贝基础之一
+ *
  * A virtual buffer which shows multiple buffers as a single merged buffer.  It is recommended to use
  * {@link ByteBufAllocator#compositeBuffer()} or {@link Unpooled#wrappedBuffer(ByteBuf...)} instead of calling the
  * constructor explicitly.

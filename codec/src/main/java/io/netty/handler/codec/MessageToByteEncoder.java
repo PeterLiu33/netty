@@ -137,6 +137,8 @@ public abstract class MessageToByteEncoder<I> extends ChannelOutboundHandlerAdap
     protected ByteBuf allocateBuffer(ChannelHandlerContext ctx, @SuppressWarnings("unused") I msg,
                                boolean preferDirect) throws Exception {
         if (preferDirect) {
+            // 直接内存拷贝 零拷贝基础之一
+            // 还有一个是FileChannel.transferTo
             return ctx.alloc().ioBuffer();
         } else {
             return ctx.alloc().heapBuffer();
